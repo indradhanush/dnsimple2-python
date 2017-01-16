@@ -9,6 +9,8 @@ class WhoAmIResource(BaseResource):
     fields = ('user', 'account',)
 
     def __init__(self, data):
-        data = data['data']
+        if data is None:
+            return
+
         self.user = UserResource(data['user'])
         self.account = AccountResource(data['account'])

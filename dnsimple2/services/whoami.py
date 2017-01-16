@@ -8,4 +8,4 @@ class WhoAmIService(BaseService):
 
     def get(self):
         response = self.client.get(self.url)
-        return WhoAmIResource(response.json())
+        return WhoAmIResource(response)

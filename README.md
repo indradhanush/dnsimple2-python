@@ -1,4 +1,4 @@
-Dnsimple Python
+DNSimple Python
 ====
 
 [![Build Status](https://travis-ci.org/indradhanush/dnsimple2-python.svg?branch=master)](https://travis-ci.org/indradhanush/dnsimple2-python)

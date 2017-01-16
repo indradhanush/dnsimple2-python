@@ -1,7 +1,10 @@
 from cached_property import cached_property
 import requests
 
-from dnsimple2.services import WhoAmIService
+from dnsimple2.services import (
+    AccountsService,
+    WhoAmIService
+)
 
 
 class DNSimple(object):
@@ -12,7 +15,9 @@ class DNSimple(object):
         self.authentication = {
             'Authorization': 'Bearer {access_token}'.format(access_token=access_token)
         }
+
         self.whoami = WhoAmIService(self)
+        self.accounts = AccountsService(self)
 
     def _set_url(self, test_mode=True):
         if test_mode:
@@ -25,10 +30,13 @@ class DNSimple(object):
         if self._session is None:
             self._session = requests.Session()
             self._session.headers.update(**self.authentication)
+            self._session.headers.update({
+                'Accept': 'application/json'
+            })
 
         return self._session
 
     def get(self, url):
         response = self.session.get(url)
         response.raise_for_status()
-        return response
+        return response.json()['data']
