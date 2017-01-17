@@ -3,6 +3,7 @@ import requests
 
 from dnsimple2.services import (
     AccountService,
+    DomainService,
     WhoAmIService
 )
 
@@ -18,6 +19,7 @@ class DNSimple(object):
 
         self.whoami = WhoAmIService(self)
         self.accounts = AccountService(self)
+        self.domains = DomainService(self)
 
     def _set_url(self, test_mode=True):
         if test_mode:
@@ -36,7 +38,7 @@ class DNSimple(object):
 
         return self._session
 
-    def get(self, url):
-        response = self.session.get(url)
+    def get(self, url, **kwargs):
+        response = self.session.get(url, **kwargs)
         response.raise_for_status()
         return response.json()['data']
