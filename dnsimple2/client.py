@@ -2,7 +2,7 @@ from cached_property import cached_property
 import requests
 
 from dnsimple2.services import (
-    AccountsService,
+    AccountService,
     WhoAmIService
 )
 
@@ -17,7 +17,7 @@ class DNSimple(object):
         }
 
         self.whoami = WhoAmIService(self)
-        self.accounts = AccountsService(self)
+        self.accounts = AccountService(self)
 
     def _set_url(self, test_mode=True):
         if test_mode:

@@ -2,9 +2,9 @@ from dnsimple2.resources import AccountResource
 from dnsimple2.services import BaseService
 
 
-class AccountsService(BaseService):
+class AccountService(BaseService):
     def __init__(self, client):
-        super(AccountsService, self).__init__(client, 'accounts')
+        super(AccountService, self).__init__(client, 'accounts')
 
     def get(self):
         response = self.client.get(self.url)
