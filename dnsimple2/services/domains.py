@@ -11,4 +11,4 @@ class DomainService(BaseService):
 
     def get(self, account_id, **kwargs):
         response = self.client.get(self.get_url(account_id), **kwargs)
-        return [DomainResource(item) for item in response]
+        return [DomainResource(item) for item in response['data']]

@@ -41,4 +41,4 @@ class DNSimple(object):
     def get(self, url, **kwargs):
         response = self.session.get(url, **kwargs)
         response.raise_for_status()
-        return response.json()['data']
+        return response.json()

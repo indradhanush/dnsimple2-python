@@ -8,4 +8,4 @@ class AccountService(BaseService):
 
     def get(self):
         response = self.client.get(self.url)
-        return [AccountResource(item) for item in response]
+        return [AccountResource(item) for item in response['data']]
