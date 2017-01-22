@@ -27,8 +27,7 @@ class DomainServiceTests(BaseServiceTestCase):
 
     def test_create_with_no_data(self):
         with self.assertRaises(HTTPError) as e:
-            response = self.client.domains.create(424, data=None)
-            self.assertIsNone(response)
+            self.client.domains.create(424, data=None)
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 400)
@@ -42,8 +41,7 @@ class DomainServiceTests(BaseServiceTestCase):
 
     def test_create_with_invalid_data(self):
         with self.assertRaises(HTTPError) as e:
-            response = self.client.domains.create(424, dict(name='invalid-domain'))
-            self.assertIsNone(response)
+            self.client.domains.create(424, dict(name='invalid-domain'))
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 400)
@@ -61,8 +59,7 @@ class DomainServiceTests(BaseServiceTestCase):
 
     def test_get_with_invalid_domain_name(self):
         with self.assertRaises(HTTPError) as e:
-            response = self.client.domains.get(424, 'invalid-domain')
-            self.assertIsNone(response)
+            self.client.domains.get(424, 'invalid-domain')
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
@@ -78,8 +75,7 @@ class DomainServiceTests(BaseServiceTestCase):
 
     def test_delete_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
-            response = self.client.domains.delete(424, 'invalid-domain')
-            self.assertIsNone(response)
+            self.client.domains.delete(424, 'invalid-domain')
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
@@ -97,8 +93,7 @@ class DomainServiceTests(BaseServiceTestCase):
 
     def test_reset_token_with_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
-            response = self.client.domains.reset_token(424, 'invalid-domain')
-            self.assertIsNone(response)
+            self.client.domains.reset_token(424, 'invalid-domain')
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
@@ -131,8 +126,7 @@ class CollaboratorServiceTests(BaseServiceTestCase):
                 'id': 1,
                 'account_id': 424
             })
-            response = self.client.domains.collaborators.list(domain)
-            self.assertIsNone(response)
+            self.client.domains.collaborators.list(domain)
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
