@@ -93,6 +93,17 @@ class DomainServiceTests(BaseServiceTestCase):
         self.assertIsNone(response)
 
     def test_reset_token_with_invalid_domain(self):
+        with self.assertRaises(HTTPError) as e:
+            response = self.client.domains.reset_token(424, 'invalid-domain')
+            self.assertIsNone(response)
+
+        exception = e.exception
+        self.assertEqual(exception.response.status_code, 404)
+        self.assertEqual(exception.response.json(), {
+            "message": "Domain `invalid-domain` not found"
+        })
+
+    def test_reset_token_with_valid_domain(self):
         name = 'example-{uuid}.org'.format(uuid=uuid4().hex)
         domain = self.client.domains.create(424, dict(name=name))
 
