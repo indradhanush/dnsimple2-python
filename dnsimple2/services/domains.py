@@ -50,3 +50,9 @@ class CollaboratorService(BaseService):
     def list(self, domain):
         response = self.client.get(self.get_url(domain))
         return [CollaboratorResource(item) for item in response['data']]
+
+    def add(self, domain, email):
+        response = self.client.post(self.get_url(domain), {
+            'email': email
+        })
+        return CollaboratorResource(response['data'])

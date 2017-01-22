@@ -119,14 +119,14 @@ class CollaboratorServiceTests(BaseServiceTestCase):
         super(CollaboratorServiceTests, cls).setUpClass()
         name = 'example-{uuid}.org'.format(uuid=uuid4().hex)
         cls.domain = cls.client.domains.create(424, dict(name=name))
+        cls.invalid_domain = DomainResource(data={
+            'id': 1,
+            'account_id': 424
+        })
 
     def test_list_collaborators_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
-            domain = DomainResource(data={
-                'id': 1,
-                'account_id': 424
-            })
-            self.client.domains.collaborators.list(domain)
+            self.client.domains.collaborators.list(self.invalid_domain)
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
@@ -139,3 +139,20 @@ class CollaboratorServiceTests(BaseServiceTestCase):
         self.assertIsInstance(response, list)
         for item in response:
             self.assertIsInstance(item, CollaboratorResource)
+
+    def test_add_collaborators_for_invalid_domain(self):
+        with self.assertRaises(HTTPError) as e:
+            email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
+            self.client.domains.collaborators.add(self.invalid_domain, email)
+
+        exception = e.exception
+        self.assertEqual(exception.response.status_code, 404)
+        self.assertEqual(exception.response.json(), {
+            "message": "Domain `1` not found"
+        })
+
+    def test_add_collaborators_for_valid_domain(self):
+        email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
+        response = self.client.domains.collaborators.add(self.domain, email)
+        self.assertIsInstance(response, CollaboratorResource)
+        self.assertEqual(response.user_email, email)
