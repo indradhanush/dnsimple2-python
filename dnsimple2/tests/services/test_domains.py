@@ -73,7 +73,7 @@ class DomainServiceTests(BaseServiceTestCase):
         self.assertIsInstance(response, DomainResource)
         self.assertEqual(response.name, self.domain)
 
-    def test_delete_with_invalid_data(self):
+    def test_delete_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
             response = self.client.domains.delete(424, 'invalid-domain')
             self.assertIsNone(response)
@@ -87,8 +87,18 @@ class DomainServiceTests(BaseServiceTestCase):
     def test_delete_with_valid_data(self):
         # We cannot use self.domain here because the `get` tests use it.
         domain = 'example-{uuid}.org'.format(uuid=uuid4().hex)
-
         self.client.domains.create(424, dict(name=domain))
 
         response = self.client.domains.delete(424, domain)
         self.assertIsNone(response)
+
+    def test_reset_token_with_invalid_domain(self):
+        name = 'example-{uuid}.org'.format(uuid=uuid4().hex)
+        domain = self.client.domains.create(424, dict(name=name))
+
+        response = self.client.domains.reset_token(424, domain.name)
+        self.assertIsInstance(response, DomainResource)
+        self.assertEqual(domain.id, response.id)
+        self.assertEqual(domain.account_id, response.account_id)
+        self.assertEqual(domain.name, response.name)
+        self.assertNotEqual(domain.token, response.token)

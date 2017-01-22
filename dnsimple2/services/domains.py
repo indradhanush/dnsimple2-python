@@ -27,3 +27,8 @@ class DomainService(BaseService):
 
     def delete(self, account_id, domain):
         self.client.delete(self.get_url(account_id, domain))
+
+    def reset_token(self, account_id, domain):
+        url = self.get_url(account_id, domain) + "/token"
+        response = self.client.post(url)
+        return DomainResource(response['data'])
