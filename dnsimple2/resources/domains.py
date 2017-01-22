@@ -1,5 +1,3 @@
-from dateutil.parser import parser
-
 from dnsimple2.resources.base import BaseResource
 
 
@@ -14,10 +12,19 @@ class DomainResource(BaseResource):
         self.state = data.get('state')
         self.auto_renew = data.get('auto_renew')
         self.private_whois = data.get('private_whois')
+        self.expires_on = self.parse_datetime(data.get('expires_on'))
+        self.created_at = self.parse_datetime(data.get('created_at'))
+        self.updated_at = self.parse_datetime(data.get('updated_at'))
 
-        expires_on = data.get('expires_on')
-        if expires_on is not None:
-            self.expires_on = parser.parse(expires_on) if expires_on else None
 
-        self.created_at = data.get('created_at')
-        self.updated_at = data.get('updated_at')
+class CollaboratorResource(BaseResource):
+    def __init__(self, data):
+        self.id = data.get('id')
+        self.domain_id = data.get('domain_id')
+        self.domain_name = data.get('domain_name')
+        self.user_id = data.get('user_id')
+        self.user_email = data.get('user_email')
+        self.invitation = data.get('invitation')
+        self.created_at = self.parse_datetime(data.get('created_at'))
+        self.updated_at = self.parse_datetime(data.get('updated_at'))
+        self.accepted_at = self.parse_datetime(data.get('accepted_at'))

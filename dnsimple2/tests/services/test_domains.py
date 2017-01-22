@@ -2,7 +2,10 @@ from uuid import uuid4
 
 from requests.exceptions import HTTPError
 
-from dnsimple2.resources import DomainResource
+from dnsimple2.resources import (
+    CollaboratorResource,
+    DomainResource
+)
 from dnsimple2.tests.services.base import BaseServiceTestCase
 
 
@@ -113,3 +116,32 @@ class DomainServiceTests(BaseServiceTestCase):
         self.assertEqual(domain.account_id, response.account_id)
         self.assertEqual(domain.name, response.name)
         self.assertNotEqual(domain.token, response.token)
+
+
+class CollaboratorServiceTests(BaseServiceTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(CollaboratorServiceTests, cls).setUpClass()
+        name = 'example-{uuid}.org'.format(uuid=uuid4().hex)
+        cls.domain = cls.client.domains.create(424, dict(name=name))
+
+    def test_list_collaborators_for_invalid_domain(self):
+        with self.assertRaises(HTTPError) as e:
+            domain = DomainResource(data={
+                'id': 1,
+                'account_id': 424
+            })
+            response = self.client.domains.collaborators.list(domain)
+            self.assertIsNone(response)
+
+        exception = e.exception
+        self.assertEqual(exception.response.status_code, 404)
+        self.assertEqual(exception.response.json(), {
+            "message": "Domain `1` not found"
+        })
+
+    def test_list_collaborators_for_valid_domain(self):
+        response = self.client.domains.collaborators.list(self.domain)
+        self.assertIsInstance(response, list)
+        for item in response:
+            self.assertIsInstance(item, CollaboratorResource)

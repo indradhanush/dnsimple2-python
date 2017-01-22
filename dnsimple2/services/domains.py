@@ -1,10 +1,14 @@
-from dnsimple2.resources import DomainResource
+from dnsimple2.resources import (
+    CollaboratorResource,
+    DomainResource
+)
 from dnsimple2.services import BaseService
 
 
 class DomainService(BaseService):
     def __init__(self, client):
         super(DomainService, self).__init__(client, '{account_id}/domains')
+        self.collaborators = CollaboratorService(self)
 
     def get_url(self, account_id, domain=None):
         url = self.url.format(account_id=account_id)
@@ -32,3 +36,17 @@ class DomainService(BaseService):
         url = self.get_url(account_id, domain) + "/token"
         response = self.client.post(url)
         return DomainResource(response['data'])
+
+
+class CollaboratorService(BaseService):
+    def __init__(self, domains):
+        self.domains = domains
+        self.client = domains.client
+
+    def get_url(self, domain):
+        url = self.domains.get_url(domain.account_id, domain.id)
+        return url + '/collaborators'
+
+    def list(self, domain):
+        response = self.client.get(self.get_url(domain))
+        return [CollaboratorResource(item) for item in response['data']]
