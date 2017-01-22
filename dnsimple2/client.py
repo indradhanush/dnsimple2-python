@@ -47,3 +47,7 @@ class DNSimple(object):
         response = self.session.post(url, data=data)
         response.raise_for_status()
         return response.json()
+
+    def delete(self, url):
+        response = self.session.delete(url)
+        response.raise_for_status()

@@ -24,3 +24,6 @@ class DomainService(BaseService):
     def create(self, account_id, data):
         response = self.client.post(self.get_url(account_id), data)
         return DomainResource(response['data'])
+
+    def delete(self, account_id, domain):
+        self.client.delete(self.get_url(account_id, domain))
