@@ -42,3 +42,8 @@ class DNSimple(object):
         response = self.session.get(url, **kwargs)
         response.raise_for_status()
         return response.json()
+
+    def post(self, url, data):
+        response = self.session.post(url, data=data)
+        response.raise_for_status()
+        return response.json()
