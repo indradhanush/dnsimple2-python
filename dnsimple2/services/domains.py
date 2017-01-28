@@ -1,6 +1,7 @@
 from dnsimple2.resources import (
     CollaboratorResource,
-    DomainResource
+    DomainResource,
+    EmailForwardResource
 )
 from dnsimple2.services import BaseService
 
@@ -9,6 +10,7 @@ class DomainService(BaseService):
     def __init__(self, client):
         super(DomainService, self).__init__(client, '{account_id}/domains')
         self.collaborators = CollaboratorService(self)
+        self.email_forwards = EmailForwardService(self)
 
     def get_url(self, account_id, domain=None):
         url = self.url.format(account_id=account_id)
@@ -65,3 +67,36 @@ class CollaboratorService(BaseService):
 
     def delete(self, domain, collaborator):
         self.client.delete(self.get_url(domain, collaborator))
+
+
+class EmailForwardService(BaseService):
+    def __init__(self, domain_service):
+        super(EmailForwardService, self).__init__(
+            client=domain_service.client,
+            endpoint='{account_id}/domains/{domain_id}/email_forwards'
+        )
+
+    def get_url(self, domain, email_forward=None):
+        url = self.url.format(account_id=domain.account_id, domain_id=domain.id)
+        if email_forward is not None:
+            return url + '/{email_forward_id}'.format(email_forward_id=email_forward.id)
+
+        return url
+
+    def list(self, domain):
+        response = self.client.get(self.get_url(domain))
+        return [EmailForwardResource(item) for item in response['data']]
+
+    def get(self, domain, email_forward):
+        response = self.client.get(self.get_url(domain, email_forward))
+        return EmailForwardResource(response['data'])
+
+    def create(self, domain, email_forward):
+        response = self.client.post(self.get_url(domain), {
+            'from': email_forward.from_email,
+            'to': email_forward.to
+        })
+        return EmailForwardResource(response['data'])
+
+    def delete(self, domain, email_forward):
+        self.client.delete(self.get_url(domain, email_forward))

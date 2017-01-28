@@ -28,3 +28,13 @@ class CollaboratorResource(BaseResource):
         self.created_at = self.parse_datetime(data.get('created_at'))
         self.updated_at = self.parse_datetime(data.get('updated_at'))
         self.accepted_at = self.parse_datetime(data.get('accepted_at'))
+
+
+class EmailForwardResource(BaseResource):
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.domain_id = kwargs.get('domain_id')
+        self.from_email = kwargs.get('from_email')
+        self.to = kwargs.get('to')
+        self.created_at = self.parse_datetime(kwargs.get('created_at'))
+        self.updated_at = self.parse_datetime(kwargs.get('updated_at'))
