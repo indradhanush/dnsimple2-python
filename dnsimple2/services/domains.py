@@ -40,19 +40,28 @@ class DomainService(BaseService):
 
 class CollaboratorService(BaseService):
     def __init__(self, domains):
+        super(CollaboratorService, self).__init__(
+            domains.client,
+            '{account_id}/domains/{domain_id}/collaborators'
+        )
         self.domains = domains
-        self.client = domains.client
 
-    def get_url(self, domain):
-        url = self.domains.get_url(domain.account_id, domain.id)
-        return url + '/collaborators'
+    def get_url(self, domain, collaborator=None):
+        url = self.url.format(account_id=domain.account_id, domain_id=domain.id)
+        if collaborator is not None:
+            return url + '/{collaborator_id}'.format(collaborator_id=collaborator.id)
+
+        return url
 
     def list(self, domain):
         response = self.client.get(self.get_url(domain))
         return [CollaboratorResource(item) for item in response['data']]
 
-    def add(self, domain, email):
+    def add(self, domain, collaborator):
         response = self.client.post(self.get_url(domain), {
-            'email': email
+            'email': collaborator.user_email
         })
         return CollaboratorResource(response['data'])
+
+    def delete(self, domain, collaborator):
+        self.client.delete(self.get_url(domain, collaborator))

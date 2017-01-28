@@ -119,6 +119,12 @@ class CollaboratorServiceTests(BaseServiceTestCase):
         super(CollaboratorServiceTests, cls).setUpClass()
         name = 'example-{uuid}.org'.format(uuid=uuid4().hex)
         cls.domain = cls.client.domains.create(424, dict(name=name))
+
+        email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
+        cls.collaborator = cls.client.domains.collaborators.add(
+            cls.domain,
+            CollaboratorResource(dict(user_email=email))
+        )
         cls.invalid_domain = DomainResource(data={
             'id': 1,
             'account_id': 424
@@ -143,7 +149,10 @@ class CollaboratorServiceTests(BaseServiceTestCase):
     def test_add_collaborators_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
             email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
-            self.client.domains.collaborators.add(self.invalid_domain, email)
+            self.client.domains.collaborators.add(
+                self.invalid_domain,
+                CollaboratorResource(dict(user_email=email))
+            )
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
@@ -153,6 +162,18 @@ class CollaboratorServiceTests(BaseServiceTestCase):
 
     def test_add_collaborators_for_valid_domain(self):
         email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
-        response = self.client.domains.collaborators.add(self.domain, email)
+        response = self.client.domains.collaborators.add(
+            self.domain, CollaboratorResource(dict(user_email=email))
+        )
         self.assertIsInstance(response, CollaboratorResource)
         self.assertEqual(response.user_email, email)
+
+    def test_delete_collaborator_for_valid_domain(self):
+        # Currently the API returns a 500 even though the collaborator is
+        # deleted. Our tests will match that, so when this is fixed on
+        # DNSimple, our tests start failing and we will take notice.
+        with self.assertRaises(HTTPError) as e:
+            self.client.domains.collaborators.delete(self.domain, self.collaborator)
+
+        exception = e.exception
+        self.assertEqual(exception.response.status_code, 500)
