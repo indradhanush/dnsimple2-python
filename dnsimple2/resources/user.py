@@ -1,5 +1,3 @@
-from dateutil.parser import parse
-
 from dnsimple2.resources import BaseResource
 
 
@@ -9,5 +7,5 @@ class UserResource(BaseResource):
     def __init__(self, **kwargs):
         self.id = kwargs.get('id')
         self.email = kwargs.get('email')
-        self.created_at = parse(kwargs.get('created_at'))
-        self.updated_at = parse(kwargs.get('updated_at'))
+        self.created_at = self.parse_datetime(kwargs.get('created_at'))
+        self.updated_at = self.parse_datetime(kwargs.get('updated_at'))
