@@ -8,7 +8,10 @@ from dnsimple2.services import BaseService
 
 class DomainService(BaseService):
     def __init__(self, client):
-        super(DomainService, self).__init__(client, '{account_id}/domains')
+        super(DomainService, self).__init__(
+            client=client,
+            endpoint='{account_id}/domains'
+        )
         self.collaborators = CollaboratorService(self)
         self.email_forwards = EmailForwardService(self)
 
@@ -43,8 +46,8 @@ class DomainService(BaseService):
 class CollaboratorService(BaseService):
     def __init__(self, domains):
         super(CollaboratorService, self).__init__(
-            domains.client,
-            '{account_id}/domains/{domain_id}/collaborators'
+            client=domains.client,
+            endpoint='{account_id}/domains/{domain_id}/collaborators'
         )
         self.domains = domains
 
