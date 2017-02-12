@@ -14,7 +14,9 @@ class BaseServiceTestCase(TestCase):
     def setUpClass(cls):
         access_token = os.getenv('DNSIMPLE_V2_ACCESS_TOKEN')
         cls.client = DNSimple(access_token)
-        cls.account = AccountResource(id=424)
+
+        account_id = os.getenv('DNSIMPLE_ACCOUNT_ID')
+        cls.account = AccountResource(id=account_id)
         cls.domain = cls.client.domains.create(
             cls.account,
             DomainResource(name=get_test_domain_name(), account=cls.account)
