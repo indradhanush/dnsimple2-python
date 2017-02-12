@@ -10,7 +10,7 @@ from dnsimple2.resources import (
 )
 from dnsimple2.tests.services.base import BaseServiceTestCase
 from dnsimple2.tests.utils import (
-    get_test_domain,
+    get_test_domain_name,
     get_test_email
 )
 
@@ -19,7 +19,7 @@ class DomainServiceTests(BaseServiceTestCase):
     @classmethod
     def setUpClass(cls):
         super(DomainServiceTests, cls).setUpClass()
-        cls.domain = 'example-{uuid}.org'.format(uuid=uuid4().hex)
+        cls.domain_name = get_test_domain_name()
 
     @classmethod
     def tearDownClass(cls):
@@ -60,7 +60,7 @@ class DomainServiceTests(BaseServiceTestCase):
         )
 
     def test_create_with_valid_data(self):
-        response = self.client.domains.create(self.account, dict(name=self.domain))
+        response = self.client.domains.create(self.account, dict(name=self.domain_name))
         self.assertIsInstance(response, DomainResource)
 
     def test_get_with_invalid_domain_name(self):
@@ -74,10 +74,10 @@ class DomainServiceTests(BaseServiceTestCase):
         })
 
     def test_get_with_valid_domain_name(self):
-        # test_create will execute before this, thus self.domain will be available
-        response = self.client.domains.get(self.account, self.domain)
+        # test_create will execute before this, thus self.domain_name will be available
+        response = self.client.domains.get(self.account, self.domain_name)
         self.assertIsInstance(response, DomainResource)
-        self.assertEqual(response.name, self.domain)
+        self.assertEqual(response.name, self.domain_name)
 
     def test_delete_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
@@ -90,7 +90,7 @@ class DomainServiceTests(BaseServiceTestCase):
         })
 
     def test_delete_with_valid_data(self):
-        # We cannot use self.domain here because the `get` tests use it.
+        # We cannot use self.domain_name here because the `get` tests use it.
         domain = 'example-{uuid}.org'.format(uuid=uuid4().hex)
         self.client.domains.create(self.account, dict(name=domain))
 
@@ -126,10 +126,9 @@ class CollaboratorServiceTests(BaseServiceTestCase):
         name = 'example-{uuid}.org'.format(uuid=uuid4().hex)
         cls.domain = cls.client.domains.create(cls.account, dict(name=name))
 
-        email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
         cls.collaborator = cls.client.domains.collaborators.add(
             cls.domain,
-            CollaboratorResource(user_email=email)
+            CollaboratorResource(user_email=get_test_email())
         )
         cls.invalid_domain = DomainResource(id=1, account=cls.account)
 
@@ -151,10 +150,9 @@ class CollaboratorServiceTests(BaseServiceTestCase):
 
     def test_add_collaborators_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
-            email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
             self.client.domains.collaborators.add(
                 self.invalid_domain,
-                CollaboratorResource(user_email=email)
+                CollaboratorResource(user_email=get_test_email())
             )
 
         exception = e.exception
@@ -164,7 +162,7 @@ class CollaboratorServiceTests(BaseServiceTestCase):
         })
 
     def test_add_collaborators_for_valid_domain(self):
-        email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
+        email = get_test_email()
         response = self.client.domains.collaborators.add(
             self.domain, CollaboratorResource(user_email=email)
         )
@@ -187,7 +185,7 @@ class EmailForwardServiceTests(BaseServiceTestCase):
     @classmethod
     def setUpClass(cls):
         super(EmailForwardServiceTests, cls).setUpClass()
-        cls.domain = cls.client.domains.create(cls.account, dict(name=get_test_domain()))
+        cls.domain = cls.client.domains.create(cls.account, dict(name=get_test_domain_name()))
         cls.invalid_domain = DomainResource(id=1, account=cls.account)
 
         email_forward = EmailForwardResource(

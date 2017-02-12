@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 
-def get_test_domain():
+def get_test_domain_name():
     """Utility to return a random domain for tests
     """
     return 'example-{uuid}.org'.format(uuid=uuid4().hex)
