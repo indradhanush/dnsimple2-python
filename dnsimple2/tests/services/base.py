@@ -2,7 +2,11 @@ import os
 from unittest import TestCase
 
 from dnsimple2.client import DNSimple
-from dnsimple2.resources import AccountResource
+from dnsimple2.resources import (
+    AccountResource,
+    DomainResource
+)
+from dnsimple2.tests.utils import get_test_domain_name
 
 
 class BaseServiceTestCase(TestCase):
@@ -11,3 +15,12 @@ class BaseServiceTestCase(TestCase):
         access_token = os.getenv('DNSIMPLE_V2_ACCESS_TOKEN')
         cls.client = DNSimple(access_token)
         cls.account = AccountResource(id=424)
+        cls.domain = cls.client.domains.create(
+            cls.account,
+            DomainResource(name=get_test_domain_name(), account=cls.account)
+        )
+        cls.invalid_domain = DomainResource(
+            id=1,
+            name='invalid-domain',
+            account=cls.account
+        )

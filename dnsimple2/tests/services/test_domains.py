@@ -1,5 +1,4 @@
 from unittest import skip
-from uuid import uuid4
 
 from requests.exceptions import HTTPError
 
@@ -17,11 +16,6 @@ from dnsimple2.tests.utils import (
 
 class DomainServiceTests(BaseServiceTestCase):
     @classmethod
-    def setUpClass(cls):
-        super(DomainServiceTests, cls).setUpClass()
-        cls.domain_name = get_test_domain_name()
-
-    @classmethod
     def tearDownClass(cls):
         # TODO: Delete domains created by tests
         pass
@@ -33,7 +27,7 @@ class DomainServiceTests(BaseServiceTestCase):
 
     def test_create_with_no_data(self):
         with self.assertRaises(HTTPError) as e:
-            self.client.domains.create(self.account, data=None)
+            self.client.domains.create(self.account, DomainResource(name='', account=self.account))
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 400)
@@ -47,7 +41,10 @@ class DomainServiceTests(BaseServiceTestCase):
 
     def test_create_with_invalid_data(self):
         with self.assertRaises(HTTPError) as e:
-            self.client.domains.create(self.account, dict(name='invalid-domain'))
+            self.client.domains.create(
+                self.account,
+                DomainResource(name='invalid-domain', account=self.account)
+            )
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 400)
@@ -60,12 +57,14 @@ class DomainServiceTests(BaseServiceTestCase):
         )
 
     def test_create_with_valid_data(self):
-        response = self.client.domains.create(self.account, dict(name=self.domain_name))
+        domain = DomainResource(name=get_test_domain_name(), account=self.account)
+        response = self.client.domains.create(self.account, domain)
         self.assertIsInstance(response, DomainResource)
+        self.assertEqual(response.name, domain.name)
 
     def test_get_with_invalid_domain_name(self):
         with self.assertRaises(HTTPError) as e:
-            self.client.domains.get(self.account, 'invalid-domain')
+            self.client.domains.get(self.account, self.invalid_domain)
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
@@ -74,14 +73,13 @@ class DomainServiceTests(BaseServiceTestCase):
         })
 
     def test_get_with_valid_domain_name(self):
-        # test_create will execute before this, thus self.domain_name will be available
-        response = self.client.domains.get(self.account, self.domain_name)
+        response = self.client.domains.get(self.account, self.domain)
         self.assertIsInstance(response, DomainResource)
-        self.assertEqual(response.name, self.domain_name)
+        self.assertEqual(response.name, self.domain.name)
 
     def test_delete_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
-            self.client.domains.delete(self.account, 'invalid-domain')
+            self.client.domains.delete(self.account, self.invalid_domain)
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
@@ -90,16 +88,18 @@ class DomainServiceTests(BaseServiceTestCase):
         })
 
     def test_delete_with_valid_data(self):
-        # We cannot use self.domain_name here because the `get` tests use it.
-        domain = 'example-{uuid}.org'.format(uuid=uuid4().hex)
-        self.client.domains.create(self.account, dict(name=domain))
-
+        # We cannot use self.domain here because other tests need it that
+        # will run after this.
+        domain = self.client.domains.create(
+            self.account,
+            DomainResource(name=get_test_domain_name(), account=self.account)
+        )
         response = self.client.domains.delete(self.account, domain)
         self.assertIsNone(response)
 
     def test_reset_token_with_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
-            self.client.domains.reset_token(self.account, 'invalid-domain')
+            self.client.domains.reset_token(self.account, self.invalid_domain)
 
         exception = e.exception
         self.assertEqual(exception.response.status_code, 404)
@@ -108,29 +108,23 @@ class DomainServiceTests(BaseServiceTestCase):
         })
 
     def test_reset_token_with_valid_domain(self):
-        name = 'example-{uuid}.org'.format(uuid=uuid4().hex)
-        domain = self.client.domains.create(self.account, dict(name=name))
-
-        response = self.client.domains.reset_token(self.account, domain.name)
+        response = self.client.domains.reset_token(self.account, self.domain)
         self.assertIsInstance(response, DomainResource)
-        self.assertEqual(domain.id, response.id)
-        self.assertEqual(domain.account.id, response.account.id)
-        self.assertEqual(domain.name, response.name)
-        self.assertNotEqual(domain.token, response.token)
+        self.assertEqual(self.domain.id, response.id)
+        self.assertEqual(self.domain.account.id, response.account.id)
+        self.assertEqual(self.domain.name, response.name)
+        self.assertNotEqual(self.domain.token, response.token)
 
 
 class CollaboratorServiceTests(BaseServiceTestCase):
     @classmethod
     def setUpClass(cls):
         super(CollaboratorServiceTests, cls).setUpClass()
-        name = 'example-{uuid}.org'.format(uuid=uuid4().hex)
-        cls.domain = cls.client.domains.create(cls.account, dict(name=name))
 
         cls.collaborator = cls.client.domains.collaborators.add(
             cls.domain,
             CollaboratorResource(user_email=get_test_email())
         )
-        cls.invalid_domain = DomainResource(id=1, account=cls.account)
 
     def test_list_collaborators_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
@@ -185,7 +179,6 @@ class EmailForwardServiceTests(BaseServiceTestCase):
     @classmethod
     def setUpClass(cls):
         super(EmailForwardServiceTests, cls).setUpClass()
-        cls.domain = cls.client.domains.create(cls.account, dict(name=get_test_domain_name()))
         cls.invalid_domain = DomainResource(id=1, account=cls.account)
 
         email_forward = EmailForwardResource(

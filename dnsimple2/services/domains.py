@@ -18,20 +18,20 @@ class DomainService(BaseService):
     def get_url(self, account, domain=None):
         url = self.url.format(account_id=account.id)
         if domain is not None:
-            return url + '/{domain}'.format(domain=domain)
+            return url + '/{name}'.format(name=domain.name or domain.id)
 
         return url
 
-    def list(self, account, **kwargs):
-        response = self.client.get(self.get_url(account), **kwargs)
+    def list(self, account):
+        response = self.client.get(self.get_url(account))
         return [DomainResource(**item) for item in response['data']]
 
-    def get(self, account, domain, **kwargs):
-        response = self.client.get(self.get_url(account, domain), **kwargs)
+    def get(self, account, domain):
+        response = self.client.get(self.get_url(account, domain))
         return DomainResource(**response['data'])
 
-    def create(self, account, data):
-        response = self.client.post(self.get_url(account), data)
+    def create(self, account, domain):
+        response = self.client.post(self.get_url(account), dict(name=domain.name))
         return DomainResource(**response['data'])
 
     def delete(self, account, domain):
