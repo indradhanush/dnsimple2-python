@@ -1,10 +1,22 @@
-from dnsimple2.resources.base import BaseResource
+from dnsimple2.errors import InvalidAccountError
+from dnsimple2.resources import (
+    AccountResource,
+    BaseResource
+)
 
 
 class DomainResource(BaseResource):
     def __init__(self, **kwargs):
         self.id = kwargs.get('id')
-        self.account_id = kwargs.get('account_id')
+
+        account_data = kwargs.get('account_id') or kwargs.get('account')
+        if isinstance(account_data, AccountResource):
+            self.account = account_data
+        elif isinstance(account_data, int):
+            self.account = AccountResource(id=account_data)
+        else:
+            raise InvalidAccountError
+
         self.registrant_id = kwargs.get('registrant_id')
         self.name = kwargs.get('name')
         self.unicode_name = kwargs.get('unicode_name')

@@ -12,30 +12,30 @@ class DomainService(BaseService):
         self.collaborators = CollaboratorService(self)
         self.email_forwards = EmailForwardService(self)
 
-    def get_url(self, account_id, domain=None):
-        url = self.url.format(account_id=account_id)
+    def get_url(self, account, domain=None):
+        url = self.url.format(account_id=account.id)
         if domain is not None:
             return url + '/{domain}'.format(domain=domain)
 
         return url
 
-    def list(self, account_id, **kwargs):
-        response = self.client.get(self.get_url(account_id), **kwargs)
+    def list(self, account, **kwargs):
+        response = self.client.get(self.get_url(account), **kwargs)
         return [DomainResource(**item) for item in response['data']]
 
-    def get(self, account_id, domain, **kwargs):
-        response = self.client.get(self.get_url(account_id, domain), **kwargs)
+    def get(self, account, domain, **kwargs):
+        response = self.client.get(self.get_url(account, domain), **kwargs)
         return DomainResource(**response['data'])
 
-    def create(self, account_id, data):
-        response = self.client.post(self.get_url(account_id), data)
+    def create(self, account, data):
+        response = self.client.post(self.get_url(account), data)
         return DomainResource(**response['data'])
 
-    def delete(self, account_id, domain):
-        self.client.delete(self.get_url(account_id, domain))
+    def delete(self, account, domain):
+        self.client.delete(self.get_url(account, domain))
 
-    def reset_token(self, account_id, domain):
-        url = self.get_url(account_id, domain) + "/token"
+    def reset_token(self, account, domain):
+        url = self.get_url(account, domain) + "/token"
         response = self.client.post(url)
         return DomainResource(**response['data'])
 
@@ -49,7 +49,7 @@ class CollaboratorService(BaseService):
         self.domains = domains
 
     def get_url(self, domain, collaborator=None):
-        url = self.url.format(account_id=domain.account_id, domain_id=domain.id)
+        url = self.url.format(account_id=domain.account.id, domain_id=domain.id)
         if collaborator is not None:
             return url + '/{collaborator_id}'.format(collaborator_id=collaborator.id)
 
@@ -77,7 +77,7 @@ class EmailForwardService(BaseService):
         )
 
     def get_url(self, domain, email_forward=None):
-        url = self.url.format(account_id=domain.account_id, domain_id=domain.id)
+        url = self.url.format(account_id=domain.account.id, domain_id=domain.id)
         if email_forward is not None:
             return url + '/{email_forward_id}'.format(email_forward_id=email_forward.id)
 
