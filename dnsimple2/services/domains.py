@@ -21,15 +21,15 @@ class DomainService(BaseService):
 
     def list(self, account_id, **kwargs):
         response = self.client.get(self.get_url(account_id), **kwargs)
-        return [DomainResource(item) for item in response['data']]
+        return [DomainResource(**item) for item in response['data']]
 
     def get(self, account_id, domain, **kwargs):
         response = self.client.get(self.get_url(account_id, domain), **kwargs)
-        return DomainResource(response['data'])
+        return DomainResource(**response['data'])
 
     def create(self, account_id, data):
         response = self.client.post(self.get_url(account_id), data)
-        return DomainResource(response['data'])
+        return DomainResource(**response['data'])
 
     def delete(self, account_id, domain):
         self.client.delete(self.get_url(account_id, domain))
@@ -37,7 +37,7 @@ class DomainService(BaseService):
     def reset_token(self, account_id, domain):
         url = self.get_url(account_id, domain) + "/token"
         response = self.client.post(url)
-        return DomainResource(response['data'])
+        return DomainResource(**response['data'])
 
 
 class CollaboratorService(BaseService):
@@ -57,13 +57,13 @@ class CollaboratorService(BaseService):
 
     def list(self, domain):
         response = self.client.get(self.get_url(domain))
-        return [CollaboratorResource(item) for item in response['data']]
+        return [CollaboratorResource(**item) for item in response['data']]
 
     def add(self, domain, collaborator):
         response = self.client.post(self.get_url(domain), {
             'email': collaborator.user_email
         })
-        return CollaboratorResource(response['data'])
+        return CollaboratorResource(**response['data'])
 
     def delete(self, domain, collaborator):
         self.client.delete(self.get_url(domain, collaborator))
@@ -85,18 +85,18 @@ class EmailForwardService(BaseService):
 
     def list(self, domain):
         response = self.client.get(self.get_url(domain))
-        return [EmailForwardResource(item) for item in response['data']]
+        return [EmailForwardResource(**item) for item in response['data']]
 
     def get(self, domain, email_forward):
         response = self.client.get(self.get_url(domain, email_forward))
-        return EmailForwardResource(response['data'])
+        return EmailForwardResource(**response['data'])
 
     def create(self, domain, email_forward):
         response = self.client.post(self.get_url(domain), {
             'from': email_forward.from_email,
             'to': email_forward.to
         })
-        return EmailForwardResource(response['data'])
+        return EmailForwardResource(**response['data'])
 
     def delete(self, domain, email_forward):
         self.client.delete(self.get_url(domain, email_forward))

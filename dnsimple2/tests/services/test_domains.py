@@ -129,12 +129,9 @@ class CollaboratorServiceTests(BaseServiceTestCase):
         email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
         cls.collaborator = cls.client.domains.collaborators.add(
             cls.domain,
-            CollaboratorResource(dict(user_email=email))
+            CollaboratorResource(user_email=email)
         )
-        cls.invalid_domain = DomainResource(data={
-            'id': 1,
-            'account_id': 424
-        })
+        cls.invalid_domain = DomainResource(id=1, account_id=424)
 
     def test_list_collaborators_for_invalid_domain(self):
         with self.assertRaises(HTTPError) as e:
@@ -157,7 +154,7 @@ class CollaboratorServiceTests(BaseServiceTestCase):
             email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
             self.client.domains.collaborators.add(
                 self.invalid_domain,
-                CollaboratorResource(dict(user_email=email))
+                CollaboratorResource(user_email=email)
             )
 
         exception = e.exception
@@ -169,7 +166,7 @@ class CollaboratorServiceTests(BaseServiceTestCase):
     def test_add_collaborators_for_valid_domain(self):
         email = '{uuid}@mailinator.com'.format(uuid=uuid4().hex)
         response = self.client.domains.collaborators.add(
-            self.domain, CollaboratorResource(dict(user_email=email))
+            self.domain, CollaboratorResource(user_email=email)
         )
         self.assertIsInstance(response, CollaboratorResource)
         self.assertEqual(response.user_email, email)
@@ -192,10 +189,7 @@ class EmailForwardServiceTests(BaseServiceTestCase):
         super(EmailForwardServiceTests, cls).setUpClass()
 
         cls.domain = cls.client.domains.create(424, dict(name=get_test_domain()))
-        cls.invalid_domain = DomainResource(data={
-            'id': 1,
-            'account_id': 424
-        })
+        cls.invalid_domain = DomainResource(id=1, account_id=424)
 
         email_forward = EmailForwardResource(
             from_email=get_test_email(),
