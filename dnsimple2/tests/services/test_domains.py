@@ -5,7 +5,8 @@ from requests.exceptions import HTTPError
 from dnsimple2.resources import (
     CollaboratorResource,
     DomainResource,
-    EmailForwardResource
+    EmailForwardResource,
+    ResourceList
 )
 from dnsimple2.tests.services.base import BaseServiceTestCase
 from dnsimple2.tests.utils import (
@@ -22,8 +23,55 @@ class DomainServiceTests(BaseServiceTestCase):
 
     def test_list(self):
         response = self.client.domains.list(self.account)
+
+        self.assertIsInstance(response, ResourceList)
         for item in response:
             self.assertIsInstance(item, DomainResource)
+
+    def test_list_lazy_load(self):
+        resources = self.client.domains.list(self.account)
+        self.assertIsInstance(resources, ResourceList)
+
+        internal_list = resources._list
+        # Load first cached item
+        item = resources[0]
+        self.assertIsInstance(item, DomainResource)
+
+        # Load last cached item
+        item = resources[29]
+        self.assertIsInstance(item, DomainResource)
+        self.assertEqual(len(internal_list), 30)
+
+        # Lazy load second page
+        item = resources[30]
+        self.assertIsInstance(item, DomainResource)
+
+        self.assertEqual(len(internal_list), 60)
+
+        # Lazy load fifth page
+        item = resources[120]
+        self.assertIsInstance(item, DomainResource)
+
+        # We don't have slicing support yet. Thus iterate over a sub-range
+        # and do explicit asserts individually.
+        for i in range(60, 120):
+            self.assertEqual(internal_list[i], None)
+
+        self.assertEqual(len(internal_list), 150)
+
+        # Lazy load third page
+        item = resources[60]
+        self.assertIsInstance(item, DomainResource)
+        self.assertEqual(len(internal_list), 150)
+
+        for i in range(90, 120):
+            self.assertEqual(internal_list[i], None)
+
+        self.assertEqual(len(internal_list), 150)
+
+        # Load out of bounds
+        with self.assertRaises(IndexError):
+            resources[len(resources)]
 
     def test_create_with_no_data(self):
         with self.assertRaises(HTTPError) as e:
