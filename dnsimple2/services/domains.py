@@ -1,7 +1,8 @@
 from dnsimple2.resources import (
     CollaboratorResource,
     DomainResource,
-    EmailForwardResource
+    EmailForwardResource,
+    ResourceList
 )
 from dnsimple2.services import BaseService
 
@@ -22,9 +23,26 @@ class DomainService(BaseService):
 
         return url
 
-    def list(self, account):
-        response = self.client.get(self.get_url(account))
-        return [DomainResource(**item) for item in response['data']]
+    def _list(self, account, page):
+        """Private method. This is also used by ResourceList to get a bare list of
+           DomainResource objects
+        """
+        response = self.client.get(self.get_url(account), data={"page": page})
+        return [
+            DomainResource(**item) for item in response['data']
+        ], response['pagination']
+
+    def list(self, account, page=1):
+        resources, pagination = self._list(account, page)
+
+        resource_list = ResourceList(
+            self,
+            pagination['total_entries'],
+            pagination['per_page'],
+            [account]
+        )
+        resource_list.update(resources, page)
+        return resource_list
 
     def get(self, account, domain):
         response = self.client.get(self.get_url(account, domain))
