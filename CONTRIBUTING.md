@@ -35,9 +35,9 @@ think there's a better approach.
 
 ## Useful links:
 
-API Docs: https://developer.dnsimple.com/v2/
-Builds: https://travis-ci.org/indradhanush/dnsimple2-python
-Coverage: https://codecov.io/gh/indradhanush/dnsimple2-python
+- API Docs: https://developer.dnsimple.com/v2/
+- Builds: https://travis-ci.org/indradhanush/dnsimple2-python
+- Coverage: https://codecov.io/gh/indradhanush/dnsimple2-python
 
 
 ## Ideas
