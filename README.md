@@ -10,4 +10,4 @@ https://developer.dnsimple.com/v2/
 
 # Contributing
 
-See CONTRIBUTING.md
+See [CONTRIBUTING.md](CONTRIBUTING.md)
