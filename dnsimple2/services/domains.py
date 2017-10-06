@@ -2,8 +2,10 @@ from dnsimple2.resources import (
     CollaboratorResource,
     DomainResource,
     EmailForwardResource,
+    PushResource,
     ResourceList
 )
+
 from dnsimple2.services import BaseService
 
 
@@ -15,6 +17,7 @@ class DomainService(BaseService):
         )
         self.collaborators = CollaboratorService(self)
         self.email_forwards = EmailForwardService(self)
+        self.pushes = PushService(self)
 
     def get_url(self, account, domain=None):
         url = self.url.format(account_id=account.id)
@@ -121,3 +124,36 @@ class EmailForwardService(BaseService):
 
     def delete(self, domain, email_forward):
         self.client.delete(self.get_url(domain, email_forward))
+
+class PushService(BaseService):
+
+    def __init__(self, domains):
+        super(PushService, self).__init__(
+            client=domains.client,
+            endpoint='{account_id}/pushes'
+        )
+        self.domains = domains
+        self.add_endpoint = '{account_id}/domains/{domain_id}/pushes'
+
+    def get_url(self, account, push=None):
+        url = self.url.format(account_id=account.id)
+        if push is not None:
+            return url + '/{push_id}'.format(push_id=push.id)
+
+        return url
+
+    def get_url_for_add(self, domain):
+        url = ('{base_url}'+self.add_endpoint).format(base_url = self.domains.client.api_url,
+                                                      account_id = domain.account.id,
+                                                      domain_id = domain.id)
+        return url
+
+    def list(self, account):
+        response = self.client.get(self.get_url(account))
+        return [PushResource(**item) for item in response['data']]
+
+    def add(self, domain, push):
+        response = self.client.post(self.get_url_for_add(domain), {
+            'new_account_email': push.new_account_email
+        })
+        return PushResource(**response['data'])
