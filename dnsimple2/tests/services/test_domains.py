@@ -8,6 +8,7 @@ from dnsimple2.resources import (
     EmailForwardResource,
     ResourceList
 )
+from dnsimple2.resources.domains import PushResource
 from dnsimple2.tests.services.base import BaseServiceTestCase
 from dnsimple2.tests.utils import (
     get_test_domain_name,
@@ -269,3 +270,26 @@ class EmailForwardServiceTests(BaseServiceTestCase):
         self.assertEqual(response.id, self.email_forward.id)
         self.assertEqual(response.from_email, self.email_forward.from_email)
         self.assertEqual(response.to, self.email_forward.to)
+
+
+class PushServiceTests(BaseServiceTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(PushServiceTests, cls).setUpClass()
+        cls.push = cls.client.domains.pushes.add(
+            cls.domain,
+            PushResource(new_account_email='at.mishra007@gmail.com')
+        )
+
+    def test_list_push_for_invalid_account(self):
+        with self.assertRaises(HTTPError) as e:
+            self.client.domains.pushes.list(self.invalid_account)
+
+        exception = e.exception
+        self.assertEqual(exception.response.status_code, 401)
+
+    def test_list_push_for_valid_account(self):
+        response = self.client.domains.pushes.list(self.account)
+        self.assertIsInstance(response, list)
+        for item in response:
+            self.assertIsInstance(item, PushResource)

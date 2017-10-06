@@ -50,3 +50,14 @@ class EmailForwardResource(BaseResource):
         self.to = kwargs.get('to')
         self.created_at = self.parse_datetime(kwargs.get('created_at'))
         self.updated_at = self.parse_datetime(kwargs.get('updated_at'))
+
+class PushResource(BaseResource):
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.domain_id = kwargs.get('domain_id')
+        self.new_account_email = kwargs.get('new_account_email')
+        self.contact_id = kwargs.get('contact_id')
+        self.account_id = kwargs.get('account_id')
+        self.accepted_date = self.parse_datetime(kwargs.get('accepted_date'))
+        self.created_at = self.parse_datetime(kwargs.get('created_at'))
+        self.updated_at = self.parse_datetime(kwargs.get('updated_at'))

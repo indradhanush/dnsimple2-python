@@ -26,3 +26,4 @@ class BaseServiceTestCase(TestCase):
             name='invalid-domain',
             account=cls.account
         )
+        cls.invalid_account = AccountResource(id=2, email='invalid-account@test.com')
