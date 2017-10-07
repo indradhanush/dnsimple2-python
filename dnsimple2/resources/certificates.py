@@ -16,3 +16,12 @@ class CertificateResource(resources.BaseResource):
         self.created_at = self.parse_datetime(kwargs.get('created_at'))
         self.updated_at = self.parse_datetime(kwargs.get('updated_at'))
         self.expires_on = self.parse_date(kwargs.get('expires_on'))
+
+
+class DownloadedCertificateResource(resources.BaseResource):
+    def __init__(self, **kwargs):
+        super(DownloadedCertificateResource, self).__init__(**kwargs)
+
+        self.server = kwargs.get('server')
+        self.root = kwargs.get('root')
+        self.chain = kwargs.get('chain')

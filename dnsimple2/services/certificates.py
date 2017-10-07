@@ -8,14 +8,14 @@ class CertificateService(services.BaseService):
             endpoint='{account_id}/domains/{domain_id}/certificates',
         )
 
-    def get_url(self, account, domain, certificate=None):
+    def get_url(self, account, domain, certificate_id=None):
         url = self.url.format(
             account_id=account.id,
             domain_id=domain.id,
         )
 
-        if certificate:
-            url += '/{certificate_id}'.format(certificate_id=certificate.id)
+        if certificate_id:
+            url += '/{certificate_id}'.format(certificate_id=certificate_id)
 
         return url
 
@@ -40,3 +40,20 @@ class CertificateService(services.BaseService):
         )
         resource_list.update(certificates, page)
         return resource_list
+
+    def get(self, account, domain, certificate_id):
+        response = self.client.get(self.get_url(
+            account, domain, certificate_id=certificate_id,
+        ))
+        return resources.CertificateResource(**response['data'])
+
+    def download(self, account, domain, certificate_id):
+        response = self.client.get(self.get_url(
+            account, domain, certificate_id=certificate_id,
+        ) + "/download")
+        return resources.DownloadedCertificateResource(**response['data'])
+
+    def get_private_key(self, account, domain, certificate_id):
+        return self.client.get(self.get_url(
+            account, domain, certificate_id=certificate_id,
+        ) + "/private_key")['data']['private_key']
