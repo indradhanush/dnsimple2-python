@@ -1,5 +1,6 @@
 from dnsimple2.resources.accounts import AccountResource
 from dnsimple2.resources.base import BaseResource, ResourceList
+from dnsimple2.resources.certificates import CertificateResource
 from dnsimple2.resources.domains import (
     CollaboratorResource,
     DomainResource,

@@ -4,8 +4,17 @@ from dateutil import parser
 
 
 class BaseResource(object):
-    def parse_datetime(self, value):
+    def __init__(self, **kwargs):
+        self._raw = kwargs
+
+    @classmethod
+    def parse_datetime(cls, value):
         return parser.parse(value) if value else None
+
+    @classmethod
+    def parse_date(cls, value):
+        datetime = cls.parse_datetime(value)
+        return datetime.date() if datetime else None
 
 
 class ResourceList(MutableSequence):

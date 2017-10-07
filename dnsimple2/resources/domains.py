@@ -7,6 +7,8 @@ from dnsimple2.resources import (
 
 class DomainResource(BaseResource):
     def __init__(self, **kwargs):
+        super(DomainResource, self).__init__(**kwargs)
+
         self.id = kwargs.get('id')
 
         account_data = kwargs.get('account_id') or kwargs.get('account')
@@ -31,6 +33,8 @@ class DomainResource(BaseResource):
 
 class CollaboratorResource(BaseResource):
     def __init__(self, **kwargs):
+        super(CollaboratorResource, self).__init__(**kwargs)
+
         self.id = kwargs.get('id')
         self.domain_id = kwargs.get('domain_id')
         self.domain_name = kwargs.get('domain_name')
@@ -44,6 +48,8 @@ class CollaboratorResource(BaseResource):
 
 class EmailForwardResource(BaseResource):
     def __init__(self, **kwargs):
+        super(EmailForwardResource, self).__init__(**kwargs)
+
         self.id = kwargs.get('id')
         self.domain_id = kwargs.get('domain_id')
         self.from_email = kwargs.get('from_email')

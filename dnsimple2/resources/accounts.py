@@ -5,6 +5,8 @@ class AccountResource(BaseResource):
     fields = ('id', 'email', 'plan_identifier', 'created_at', 'updated_at',)
 
     def __init__(self, **kwargs):
+        super(AccountResource, self).__init__(**kwargs)
+
         self.id = kwargs.get('id')
         self.email = kwargs.get('email')
         self.plan_identifier = kwargs.get('plan_identifier')

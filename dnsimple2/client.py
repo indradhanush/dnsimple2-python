@@ -3,8 +3,9 @@ import requests
 
 from dnsimple2.services import (
     AccountService,
+    CertificateService,
     DomainService,
-    WhoAmIService
+    WhoAmIService,
 )
 
 
@@ -20,6 +21,7 @@ class DNSimple(object):
         self.whoami = WhoAmIService(self)
         self.accounts = AccountService(self)
         self.domains = DomainService(self)
+        self.certificates = CertificateService(self)
 
     def _set_url(self, test_mode=True):
         if test_mode:

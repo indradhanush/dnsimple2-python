@@ -5,6 +5,8 @@ class UserResource(BaseResource):
     fields = ('id', 'email', 'created_at', 'updated_at',)
 
     def __init__(self, **kwargs):
+        super(UserResource, self).__init__(**kwargs)
+
         self.id = kwargs.get('id')
         self.email = kwargs.get('email')
         self.created_at = self.parse_datetime(kwargs.get('created_at'))
