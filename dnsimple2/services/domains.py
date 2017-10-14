@@ -143,6 +143,11 @@ class PushService(BaseService):
         return url
 
     def get_url_for_add(self, domain):
+        """
+        returns URL for add push
+        :param domain: Domain Resource Object
+        :return: URL
+        """
         url = ('{base_url}'+self.add_endpoint).format(base_url = self.domains.client.api_url,
                                                       account_id = domain.account.id,
                                                       domain_id = domain.id)
