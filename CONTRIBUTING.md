@@ -8,11 +8,18 @@ billing info. Under the credit card, add `1` as the number. You can
 read more here: https://developer.dnsimple.com/sandbox/#testing-subscriptions
 4. Optionally set up your repo to build on
    [Travis CI](http://travis-ci.org/) and to generate coverage reports
-   on [CodeCov](https://codecov.io/gh/indradhanush/dnsimple2-python).
+   on
+   [CodeCov](https://codecov.io/gh/indradhanush/dnsimple2-python). Remember
+   to disable concurrent builds on Travis. This prevents inconsistent
+   state on the sandbox account and the tests failing as a result. To
+   do this click on `Settings` and turn on the option that says `Limit
+   concurrent jobs` and set the value to `1`.
 5. Setup the dev environment:
 6. Set the environment variables in your `.bashrc` or `.bash_profile` equivalent:
    - `DNSIMPLE_ACCOUNT_ID`
    - `DNSIMPLE_V2_ACCESS_TOKEN`
+   Note: If you set up your repo to build
+   on Travis, please ensure you add these keys on Travis as well.
 7. Create a virtualenv: `virtualenv venv -p python3.5`
 8. Activate the venv: `source venv/bin/activate`
 9. Install the dependencies: `pip install -r requirements.txt`
